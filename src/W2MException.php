@@ -10,6 +10,6 @@ class W2MException extends Exception {
 	}
 
 	public static function throw($error) {
-		throw new self($error->get_error_message(), $error->get_error_code());
+		throw new self($error->get_error_message(), is_numeric($error->get_error_code()) ?? 0);
 	}
 }

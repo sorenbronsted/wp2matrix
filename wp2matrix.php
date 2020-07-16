@@ -5,4 +5,4 @@
 */
 require plugin_dir_path( __FILE__ ).'vendor/autoload.php';
 
-$wp2Matrix = new Wp2Matrix();
+Wp2Matrix::instance();

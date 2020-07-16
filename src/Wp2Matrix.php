@@ -14,19 +14,28 @@ class Wp2Matrix {
 	const userId = 'userId';
 
 	private $matrix;
+	private static $instance = null;
 
-	public function __construct() {
+	protected function __construct() {
 		$this->matrix = new Matrix(new Http());
-		add_action( 'admin_init', [ __CLASS__, 'onInit' ] );
-		add_action( 'admin_menu', [ __CLASS__, 'onMenu' ] );
-		add_filter( 'pre_update_option', [ __CLASS__, 'onPreUpdate' ], 10, 3 );
-		add_action( 'publish_post', [ __CLASS__, 'onPostPublish' ], 10, 2 );
+	}
+
+	protected function init() {
+		 add_action( 'admin_init', [ Wp2Matrix::instance(), 'onInit' ] );
+		 add_action( 'admin_menu', [ Wp2Matrix::instance(), 'onMenu' ] );
+		 add_filter( 'pre_update_option', [ Wp2Matrix::instance(), 'onPreUpdate' ], 10, 3 );
+		 add_action( 'publish_post', [ Wp2Matrix::instance(), 'onPostPublish' ], 10, 2 );
+	}
+
+	public static function instance() {
+		if (self::$instance == null) {
+			 self::$instance = new Wp2Matrix();
+			 self::$instance->init();
+		}
+		return self::$instance;
 	}
 
 	public function onPostPublish( $id, $post ) {
-		if ( did_action( 'publish_post' ) > 0) {
-			return;
-		}
 		$data = get_option( self::settings );
 		try {
 			$this->matrix->post( $data[ self::url ], $data[ self::accessToken ], $data[ self::roomId ], $post );
@@ -71,7 +80,7 @@ class Wp2Matrix {
 		add_settings_section(
 				self::slug . '_section',
 				__( 'Settings for the matrix server.', self::slug ),
-				[ $this, 'addSection' ],
+				[ Wp2Matrix::instance(), 'addSection' ],
 				self::slug
 		);
 
@@ -86,7 +95,7 @@ class Wp2Matrix {
 			add_settings_field(
 					$name,
 					$label,
-					[ $this, 'addField' ],
+					[ Wp2Matrix::instance(), 'addField' ],
 					self::slug,
 					self::slug . '_section',
 					[ 'name' => $name, 'value' => $data[ $name ] ]
@@ -139,7 +148,7 @@ class Wp2Matrix {
 				'Wp2Matrix',
 				'manage_options',
 				self::slug,
-				[ $this, 'display' ]
+				[ Wp2Matrix::instance(), 'display' ]
 		);
 	}
 }
