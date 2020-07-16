@@ -9,6 +9,12 @@
       "email": "soren@bronsted.dk"
     }
   ],
+
+  "scripts": {
+    "test": "vendor/bin/phpunit",
+    "coverage": "vendor/bin/phpunit --coverage-html build/coverage"
+  },
+
   "autoload": {
     "psr-4": {
       "sbronsted\\": [
